@@ -293,7 +293,7 @@ const CONFIG = {
   // OPTIONAL second tab that fixes pin positions and adds building photos.
   // Columns: Building | Lat | Lng | Photo URL | Category. If the tab doesn't
   // exist yet, the map just uses the built-in positions below.
-  BUILDINGS_TAB_NAME: "Buildings",
+  BUILDINGS_TAB_NAMES: ["Buildings", "Building specifications"],
 
   // OPTIONAL link students can tap to report an empty or broken dispenser
   // (e.g., a Google Form). Leave "" to hide the button.
@@ -310,30 +310,30 @@ const CONFIG = {
 
 /* ==========================================================================
    2. BUILT-IN BUILDING POSITIONS
-   Approximate pin locations for WPI academic + athletic buildings. Anything
+   Pin locations for WPI academic + athletic buildings, copied from the
+   "Building specifications" tab of the club's sheet (Nov 2026). Anything
    in the optional "Buildings" tab overrides these. Use #setup mode (add
    #setup to the end of the URL) to find exact coordinates by dragging pins.
    ========================================================================== */
 const DEFAULT_BUILDINGS = {
-  "Atwater Kent Laboratories":   {lat:42.27537, lng:-71.80649, cat:"Academic", aliases:["atwater kent","ak","atwater kent labs"]},
-  "Boynton Hall":                {lat:42.27396, lng:-71.80713, cat:"Academic", aliases:["boynton"]},
-  "Rubin Campus Center":         {lat:42.27424, lng:-71.80838, cat:"Academic", aliases:["campus center","rcc","rubin"]},
-  "Daniels Hall":                {lat:42.27378, lng:-71.80948, cat:"Academic", aliases:["daniels"]},
-  "Foisie Innovation Studio":    {lat:42.27308, lng:-71.80795, cat:"Academic", aliases:["innovation studio","foisie","fis"]},
-  "Fuller Laboratories":         {lat:42.27500, lng:-71.80590, cat:"Academic", aliases:["fuller labs","fuller","fl"]},
-  "Goddard Hall":                {lat:42.27522, lng:-71.80876, cat:"Academic", aliases:["goddard"]},
-  "Gordon Library":              {lat:42.27447, lng:-71.80628, cat:"Academic", aliases:["library","gordon"]},
-  "Harrington Auditorium":       {lat:42.27358, lng:-71.80856, cat:"Athletic", aliases:["harrington"]},
-  "Higgins Laboratories":        {lat:42.27452, lng:-71.80885, cat:"Academic", aliases:["higgins labs","higgins","hl"]},
-  "Kaven Hall":                  {lat:42.27395, lng:-71.80605, cat:"Academic", aliases:["kaven","kh"]},
-  "Olin Hall":                   {lat:42.27490, lng:-71.80800, cat:"Academic", aliases:["olin","oh"]},
-  "Global Project Center":       {lat:42.27565, lng:-71.80570, cat:"Academic", aliases:["project center","laurie a leshin global project center","leshin project center"]},
-  "Sports & Recreation Center":  {lat:42.27320, lng:-71.80930, cat:"Athletic", aliases:["sports and recreation center","rec center","sports and rec","sports & rec","the rec"]},
-  "Salisbury Laboratories":      {lat:42.27490, lng:-71.80700, cat:"Academic", aliases:["salisbury labs","salisbury","sl"]},
-  "Stratton Hall":               {lat:42.27433, lng:-71.80689, cat:"Academic", aliases:["stratton","sh"]},
-  "Washburn Shops":              {lat:42.27376, lng:-71.80672, cat:"Academic", aliases:["washburn","washburn shops/stoddard laboratories","wb"]},
-  "Unity Hall":                  {lat:42.27250, lng:-71.80600, cat:"Academic", aliases:["unity"]},
-  "Alden Memorial":              {lat:42.27470, lng:-71.80950, cat:"Academic", aliases:["alden","alden hall"]},
+  "Atwater Kent Laboratories":   {lat:42.2751731, lng:-71.80728737, cat:"Academic", aliases:["atwater kent","ak","atwater kent labs"]},
+  "Boynton Hall":                {lat:42.27349954, lng:-71.80734901, cat:"Academic", aliases:["boynton"]},
+  "Rubin Campus Center":         {lat:42.2748078, lng:-71.8084276, cat:"Academic", aliases:["campus center","rcc","rubin"]},
+  "Daniels Hall":                {lat:42.27327499, lng:-71.80998719, cat:"Academic", aliases:["daniels"]},
+  "Foisie Innovation Studio":    {lat:42.27436153, lng:-71.80863433, cat:"Academic", aliases:["innovation studio","foisie","fis"]},
+  "Fuller Laboratories":         {lat:42.27499151, lng:-71.80659134, cat:"Academic", aliases:["fuller labs","fuller","fl"]},
+  "Goddard Hall":                {lat:42.27550255, lng:-71.8078037, cat:"Academic", aliases:["goddard"]},
+  "Gordon Library":              {lat:42.27429107, lng:-71.80655765, cat:"Academic", aliases:["library","gordon"]},
+  "Harrington Auditorium":       {lat:42.27428013, lng:-71.80974385, cat:"Athletic", aliases:["harrington"]},
+  "Higgins Laboratories":        {lat:42.27425066, lng:-71.80823225, cat:"Academic", aliases:["higgins labs","higgins","hl"]},
+  "Kaven Hall":                  {lat:42.27490766, lng:-71.8058648, cat:"Academic", aliases:["kaven","kh"]},
+  "Olin Hall":                   {lat:42.27506601, lng:-71.80784724, cat:"Academic", aliases:["olin","oh"]},
+  "Global Project Center":       {lat:42.27224835, lng:-71.80805827, cat:"Academic", aliases:["project center","laurie a leshin global project center","leshin project center"]},
+  "Sports & Recreation Center":  {lat:42.27438679, lng:-71.81033748, cat:"Athletic", aliases:["sports and recreation center","rec center","sports and rec","sports & rec","the rec"]},
+  "Salisbury Laboratories":      {lat:42.2746938, lng:-71.80703417, cat:"Academic", aliases:["salisbury labs","salisbury","sl"]},
+  "Stratton Hall":               {lat:42.27392195, lng:-71.80767143, cat:"Academic", aliases:["stratton","sh"]},
+  "Washburn Shops":              {lat:42.27412965, lng:-71.80716124, cat:"Academic", aliases:["washburn","washburn shops/stoddard laboratories","wb"]},
+  "Unity Hall":                  {lat:42.27374727, lng:-71.80576371, cat:"Academic", aliases:["unity"]},
 };
 
 /* ==========================================================================
@@ -395,8 +395,8 @@ function parseCSV(text){
 const FIELD_ALIASES = {
   building: ["building","building name","hall","name"],
   floor:    ["floor","level","location","floor level","floors"],
-  room:     ["room","room number","restroom","bathroom","restroom location","bathroom location","where","room location","directions"],
-  type:     ["restroom type","bathroom type","type","gender","restroom gender","bathroom gender"],
+  room:     ["room","room number","room location","room / location","restroom location","bathroom location","where","directions"],
+  type:     ["restroom type","bathroom type","type","gender","restroom gender","bathroom gender","bathroom","restroom","bathrooms","restrooms"],
   products: ["products","available resources","resources","available products","product"],
   photos:   ["photo","photos","photo url","photo urls","product photo","product photos","image","images","picture","pictures","product image"],
   notes:    ["notes","note","comments","details"],
@@ -414,13 +414,23 @@ function mapHeaders(header){
   for(const [field,names] of Object.entries(FIELD_ALIASES)){
     for(const n of names){ const i=H.indexOf(norm(n)); if(i>-1 && !(field in idx)){ idx[field]=i; break; } }
   }
-  // A Buildings tab's photo column is the building photo.
+  // Looser match for headers Google merges with a title row, e.g. "Pin Latitude".
+  H.forEach((h,i)=>{
+    const w=" "+h+" ";
+    if(!("lat" in idx) && / (lat|latitude) /.test(w)) idx.lat=i;
+    if(!("lng" in idx) && / (lng|lon|long|longitude) /.test(w)) idx.lng=i;
+    if(!("building" in idx) && / building /.test(w) && !/ (address|adress|photo|image|type) /.test(w)) idx.building=i;
+  });
   return idx;
 }
 function rowsToObjects(rows){
   if(!rows.length) return {fields:{},items:[]};
-  const fields=mapHeaders(rows[0]);
-  const items=rows.slice(1).map(r=>{
+  // The real header may sit below a title row, so use whichever of the first
+  // few rows matches the most known column names.
+  let hi=0, best=-1;
+  rows.slice(0,4).forEach((r,i)=>{ const n=Object.keys(mapHeaders(r)).length; if(n>best){best=n;hi=i;} });
+  const fields=mapHeaders(rows[hi]);
+  const items=rows.slice(hi+1).map(r=>{
     const o={}; for(const [f,i] of Object.entries(fields)) o[f]=(r[i]??"").trim(); return o;
   });
   return {fields,items};
@@ -527,9 +537,10 @@ function buildModel(restroomCSV, buildingsCSV){
     if(it.bphoto && !b.photo) b.photo=photoURL(it.bphoto);
     const typeRaw = it.type || "";
     const type = typeRaw ? detectType(typeRaw,true) : detectType([it.floor, it.room, it.notes].join(" "),false);
+    const typeWords = norm(typeRaw).replace(/\b(women|womens|woman|female|girls|men|mens|man|male|boys|all gender|gender neutral|gender inclusive|unisex|s|restroom|restrooms|bathroom|bathrooms)\b/g,"").trim();
     b.rooms.push({
       floor: floorLabel(it.floor),
-      room: it.room||"",
+      room: it.room || (typeWords ? typeRaw : ""),
       type,
       typeText: typeRaw,
       products: splitProducts(it.products||""),
@@ -540,8 +551,8 @@ function buildModel(restroomCSV, buildingsCSV){
       order:i,
     });
   });
-  // Only show buildings that have at least one dispenser OR were explicitly listed in the Buildings tab.
-  Object.keys(model).forEach(k=>{ if(!model[k].rooms.length && !model[k].listed) delete model[k]; });
+  // Only show buildings with at least one dispenser (a building in the pin tab with no restrooms listed stays hidden).
+  Object.keys(model).forEach(k=>{ if(!model[k].rooms.length) delete model[k]; });
   return model;
 }
 
@@ -560,12 +571,24 @@ async function fetchText(url, ms=9000){
     return txt;
   } finally { clearTimeout(t); }
 }
+async function loadBuildingsTab(){
+  // Returns the first listed tab that really has Lat/Lng columns (Google returns
+  // the FIRST tab when a name doesn't exist, so each one is checked).
+  for(const name of CONFIG.BUILDINGS_TAB_NAMES||[]){
+    try{
+      const txt=await fetchText(sheetCSVUrl({sheet:name}));
+      const {fields:f}=rowsToObjects(parseCSV(txt));
+      if("lat" in f && "lng" in f) return txt;
+    }catch(e){}
+  }
+  return null;
+}
 async function loadData(){
   let rest=null, bld=null;
   try{
     [rest,bld]=await Promise.all([
       fetchText(sheetCSVUrl({gid:CONFIG.RESTROOMS_GID})),
-      fetchText(sheetCSVUrl({sheet:CONFIG.BUILDINGS_TAB_NAME})).catch(()=>null),
+      loadBuildingsTab(),
     ]);
     store.set("smash-cache",{rest,bld,at:Date.now()});
     source="live";
@@ -837,7 +860,7 @@ $("#infoBtn").onclick=()=>{
     <div class="tags" style="margin-bottom:14px">${counts.map(([t,n])=>`<span class="tag" style="color:${TYPES[t].color}">${n} ${TYPES[t].short}</span>`).join("")}</div>
     <p style="line-height:1.55;margin:0 0 12px;color:var(--muted);font-size:14px"><b style="color:var(--ink)">Tip:</b> In Safari, tap Share → <i>Add to Home Screen</i> to keep this map one tap away.</p>
     ${CONFIG.REPORT_URL?`<p><a class="chipbtn" href="${esc(CONFIG.REPORT_URL)}" target="_blank" rel="noopener">${ICONS.flag}Report an empty or broken dispenser</a></p>`:""}
-    <p class="foot">${esc(CONFIG.CLUB_NAME)}${CONFIG.CLUB_CONTACT?` · ${esc(CONFIG.CLUB_CONTACT)}`:""}<br>Pin positions are approximate. Map imagery © Esri / © OpenStreetMap contributors.</p>`,"about");
+    <p class="foot">${esc(CONFIG.CLUB_NAME)}${CONFIG.CLUB_CONTACT?` · ${esc(CONFIG.CLUB_CONTACT)}`:""}<br>Map imagery © Esri / © OpenStreetMap contributors.</p>`,"about");
 };
 
 /* ---------- Setup mode (#setup): drag pins to get exact coordinates ---------- */
