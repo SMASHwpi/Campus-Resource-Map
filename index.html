@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SMASH Map">
 <meta name="theme-color" content="#AC2B37">
-<meta name="description" content="Find free menstrual product dispensers in WPI academic buildings and athletic facilities. Maintained by S.M.A.S.H.">
+<meta name="description" content="Find free menstrual product dispensers in WPI academic buildings and athletic facilities. A S.M.A.S.H. resource for WPI students.">
 <title>S.M.A.S.H. Dispenser Map · WPI</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -86,7 +86,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* ---------- Status toast ---------- */
 .toast{
-  position:fixed;z-index:700;left:50%;transform:translateX(-50%);
+  position:fixed;z-index:1300;left:50%;transform:translateX(-50%);
   top:calc(var(--safe-top) + 74px);background:rgba(29,27,28,.92);color:#fff;
   font-size:13px;padding:8px 14px;border-radius:999px;max-width:92vw;text-align:center;
   opacity:0;transition:opacity .25s;pointer-events:none;
@@ -172,6 +172,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 .thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;background:#eee;border:1px solid var(--line);display:block}
 .thumbbtn{padding:0;border:0;background:none;position:relative}
 .thumbbtn .more{position:absolute;inset:0;border-radius:10px;background:rgba(0,0,0,.5);color:#fff;font-weight:700;display:grid;place-items:center}
+.restock{
+  display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:13px;font-weight:650;
+  color:var(--crimson);text-decoration:none;border:1px solid #f0d3d6;background:#fff7f7;border-radius:999px;padding:6px 11px;
+}
+.restock svg{width:14px;height:14px}
+.restock:active{background:#fde9eb}
 .empty{padding:18px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:14px;text-align:center;margin-top:16px}
 .foot{font-size:12px;color:var(--muted);margin-top:18px;line-height:1.5}
 .foot a{color:var(--crimson)}
@@ -295,13 +301,18 @@ const CONFIG = {
   // exist yet, the map just uses the built-in positions below.
   BUILDINGS_TAB_NAMES: ["Buildings", "Building specifications"],
 
-  // OPTIONAL link students can tap to report an empty or broken dispenser
-  // (e.g., a Google Form). Leave "" to hide the button.
-  REPORT_URL: "",
+  // WPI Facilities maintenance request form. Each restroom gets a
+  // "Request restock" button: it copies that restroom's details for the
+  // student, then opens this form so they can paste them in.
+  // Leave "" to hide the buttons.
+  RESTOCK_URL: "https://wpi.webtma.com/app/request/6e6d95ff-4232-44df-b5a0-3250df11fd5c",
 
   // Shown in the About panel.
   CLUB_NAME: "S.M.A.S.H. — Society of Menstrual Awareness and Sexual Health",
-  CLUB_CONTACT: "",          // e.g. "smash@wpi.edu" or an Instagram link
+  CLUB_EMAIL: "smashatwpi@gmail.com",
+  CLUB_INSTAGRAM: "",        // e.g. "https://instagram.com/..." once you have one
+  // Shown under "Get involved". Leave "" to hide.
+  MEETINGS: "General body meetings (GBMs) are Mondays, 6–7 PM. All are welcome!",
 
   // Map start position (WPI main campus).
   CENTER: [42.27445, -71.80760],
@@ -431,7 +442,7 @@ function rowsToObjects(rows){
   rows.slice(0,4).forEach((r,i)=>{ const n=Object.keys(mapHeaders(r)).length; if(n>best){best=n;hi=i;} });
   const fields=mapHeaders(rows[hi]);
   const items=rows.slice(hi+1).map(r=>{
-    const o={}; for(const [f,i] of Object.entries(fields)) o[f]=(r[i]??"").trim(); return o;
+    const o={}; for(const [f,i] of Object.entries(fields)) o[f]=(r[i]??"").replace(/\s+/g," ").trim(); return o;
   });
   return {fields,items};
 }
@@ -475,7 +486,8 @@ function floorLabel(raw){
     const base=`Floors ${nums.slice(0,-1).join(", ")} & ${nums.at(-1)}`;
     return rest ? `${base} · ${rest}` : base;
   }
-  if(/^(b|basement|ll|lower level)$/i.test(s)) return "Basement / Lower level";
+  if(/^(b|basement)$/i.test(s)) return "Basement";
+  if(/^(ll|lower level)$/i.test(s)) return "Lower level";
   if(/^(main|g|ground)$/i.test(s)) return "Main floor";
   return s;
 }
@@ -706,7 +718,7 @@ function openBuilding(name){
   html += `<div class="actions">`;
   if(isFinite(b.lat)) html += `<a class="chipbtn" href="https://maps.apple.com/?daddr=${b.lat},${b.lng}&dirflg=w" target="_blank" rel="noopener">${ICONS.walk}Walk here</a>`;
   html += `<button class="chipbtn" data-share="${esc(name)}">${ICONS.share}Share</button>`;
-  if(CONFIG.REPORT_URL) html += `<a class="chipbtn" href="${esc(CONFIG.REPORT_URL)}" target="_blank" rel="noopener">${ICONS.flag}Report empty</a>`;
+
   html += `</div>`;
 
   if(!b.rooms.length){
@@ -733,6 +745,7 @@ function openBuilding(name){
           ${tags?`<div class="tags">${tags}</div>`:""}
           ${r.notes?`<div class="sub" style="margin-top:8px">${esc(r.notes)}</div>`:""}
           ${r.checked?`<div class="sub" style="margin-top:6px;font-size:12px">Last checked ${esc(r.checked)}</div>`:""}
+          ${CONFIG.RESTOCK_URL?`<a class="restock" href="${esc(CONFIG.RESTOCK_URL)}" target="_blank" rel="noopener" data-restock="${esc(restockText(b.name,r))}">${ICONS.flag}Empty? Request restock</a>`:""}
         </div>${thumbs}</div>`;
     });
     html += `</div>`;
@@ -743,11 +756,34 @@ function openBuilding(name){
 }
 const photoSets={};
 
+/* ---------- Restock requests ---------- */
+function restockText(building,r){
+  const parts=[building];
+  if(r.floor) parts.push(r.floor);
+  parts.push(r.type==="unk" ? "restroom" : TYPES[r.type].short+" restroom");
+  if(r.room && norm(r.room)!==norm(r.typeText)) parts.push(r.room);
+  else if(r.room) parts[parts.length-1]=r.room;
+  return `Menstrual product dispenser needs restocking: ${parts.join(", ")}. (Reported via the S.M.A.S.H. dispenser map)`;
+}
+function copyText(text){
+  // Must run inside the tap itself so iPhone Safari allows it.
+  try{ if(navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(text).catch(()=>legacyCopy(text)); return true; } }catch(e){}
+  return legacyCopy(text);
+}
+function legacyCopy(text){
+  try{
+    const ta=document.createElement("textarea"); ta.value=text; ta.setAttribute("readonly","");
+    ta.style.cssText="position:fixed;top:0;left:0;opacity:0;font-size:16px";
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,text.length);
+    const ok=document.execCommand("copy"); ta.remove(); return ok;
+  }catch(e){ return false; }
+}
+
 function footerHTML(){
   let s="";
   if(source==="fallback") s="Showing saved data — the live list couldn’t be loaded.";
   else if(source.startsWith("cache:")) s=`Offline — showing the list as of ${new Date(+source.split(":")[1]).toLocaleString()}.`;
-  return `<p class="foot">${s?esc(s)+"<br>":""}Dispensers are maintained by ${esc(CONFIG.CLUB_NAME)}.</p>`;
+  return `<p class="foot">${s?esc(s)+"<br>":""}Dispensers are stocked by WPI Facilities. This map is a resource from ${esc(CONFIG.CLUB_NAME)}.</p>`;
 }
 
 /* ---------- Building list ---------- */
@@ -786,6 +822,12 @@ $("#listBtn").onclick=openList;
 
 /* Delegated clicks inside the sheet */
 $("#sheetBody").addEventListener("click",async e=>{
+  const rs=e.target.closest("[data-restock]");
+  if(rs){ // let the link open the form; copy the details first
+    const ok=copyText(rs.dataset.restock);
+    toast(ok ? "Restroom details copied. Paste them into the request form." : "Opening the request form…");
+    return;
+  }
   const row=e.target.closest(".brow"); if(row){ openBuilding(row.dataset.b); return; }
   const ph=e.target.closest("[data-photos]"); if(ph){ openLightbox(photoSets[ph.dataset.photos]); return; }
   const sh=e.target.closest("[data-share]"); if(sh){
@@ -857,10 +899,18 @@ $("#infoBtn").onclick=()=>{
   const counts=TYPE_ORDER.map(t=>[t,Object.values(BUILDINGS).reduce((n,b)=>n+b.rooms.filter(r=>r.type===t).length,0)]).filter(([,n])=>n);
   openSheet(`<h2 id="sheetTitle" style="margin:4px 0 8px;font-size:22px">About this map</h2>
     <p style="line-height:1.55;margin:0 0 12px">Free pads and tampons are stocked in restrooms across WPI’s academic buildings and athletic facilities. Tap a building on the map to see which restrooms have a dispenser, sorted by restroom type.</p>
+    <p style="line-height:1.55;margin:0 0 12px">The dispensers are stocked by <b>WPI Facilities</b>. <b>S.M.A.S.H.</b> keeps this map up to date and works with Facilities to make sure dispensers stay stocked.</p>
+    <p style="line-height:1.55;margin:0 0 12px;color:var(--muted);font-size:14px">S.M.A.S.H. is dedicated to making menstrual and sexual health resources and information more accessible to WPI students.</p>
     <div class="tags" style="margin-bottom:14px">${counts.map(([t,n])=>`<span class="tag" style="color:${TYPES[t].color}">${n} ${TYPES[t].short}</span>`).join("")}</div>
     <p style="line-height:1.55;margin:0 0 12px;color:var(--muted);font-size:14px"><b style="color:var(--ink)">Tip:</b> In Safari, tap Share → <i>Add to Home Screen</i> to keep this map one tap away.</p>
-    ${CONFIG.REPORT_URL?`<p><a class="chipbtn" href="${esc(CONFIG.REPORT_URL)}" target="_blank" rel="noopener">${ICONS.flag}Report an empty or broken dispenser</a></p>`:""}
-    <p class="foot">${esc(CONFIG.CLUB_NAME)}${CONFIG.CLUB_CONTACT?` · ${esc(CONFIG.CLUB_CONTACT)}`:""}<br>Map imagery © Esri / © OpenStreetMap contributors.</p>`,"about");
+    ${CONFIG.RESTOCK_URL?`<p style="line-height:1.55;margin:0 0 12px;color:var(--muted);font-size:14px"><b style="color:var(--ink)">Dispenser empty?</b> Open the building, then tap <i>Request restock</i> under that restroom. We copy the restroom’s details for you, then open WPI’s maintenance request form. Paste the details into the description.</p>`:""}
+    ${(CONFIG.MEETINGS||CONFIG.CLUB_EMAIL||CONFIG.CLUB_INSTAGRAM)?`<div style="background:var(--soft);border:1px solid #f0e4e5;border-radius:14px;padding:14px;margin:4px 0 12px">
+      <b style="display:block;font-size:15px;margin-bottom:6px">Get involved with S.M.A.S.H.</b>
+      ${CONFIG.MEETINGS?`<p style="margin:0 0 8px;line-height:1.5;font-size:14px">${esc(CONFIG.MEETINGS)}</p>`:""}
+      ${CONFIG.CLUB_EMAIL?`<p style="margin:0;font-size:14px">Questions or ideas? Email <a href="mailto:${esc(CONFIG.CLUB_EMAIL)}" style="color:var(--crimson);font-weight:600">${esc(CONFIG.CLUB_EMAIL)}</a></p>`:""}
+      ${CONFIG.CLUB_INSTAGRAM?`<p style="margin:6px 0 0;font-size:14px"><a href="${esc(CONFIG.CLUB_INSTAGRAM)}" target="_blank" rel="noopener" style="color:var(--crimson);font-weight:600">Follow us on Instagram</a></p>`:""}
+    </div>`:""}
+    <p class="foot">${esc(CONFIG.CLUB_NAME)}<br>Map imagery © Esri / © OpenStreetMap contributors.</p>`,"about");
 };
 
 /* ---------- Setup mode (#setup): drag pins to get exact coordinates ---------- */
